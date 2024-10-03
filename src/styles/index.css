@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Gugi&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Iceberg&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 100;
+    src:
+      url("/fonts/GT-Walsheim-Thin.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Thin.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 300;
+    src:
+      url("/fonts/GT-Walsheim-Light.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Light.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 400;
+    src:
+      url("/fonts/GT-Walsheim-Regular.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Regular.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: oblique;
+    font-weight: 400;
+    src:
+      url("/fonts/GT-Walsheim-Regular-Oblique.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Regular-Oblique.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 500;
+    src:
+      url("/fonts/GT-Walsheim-Medium.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Medium.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: oblique;
+    font-weight: 500;
+    src:
+      url("/fonts/GT-Walsheim-Medium-Oblique.woff") format("woff2"),
+      url("/fonts/GT-Walsheim-Medium-Oblique.woff2") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 700;
+    src:
+      url("/fonts/GT-Walsheim-Bold.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Bold.woff") format("woff");
+  }
+
+  @font-face {
+    font-display: swap;
+    font-family: "GT Walsheim";
+    font-style: normal;
+    font-weight: 800;
+    src:
+      url("/fonts/GT-Walsheim-Black.woff2") format("woff2"),
+      url("/fonts/GT-Walsheim-Black.woff") format("woff");
+  }
+
+  * {
+    @apply select-none;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  img {
+    -webkit-user-drag: none;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-block w-max rounded-md bg-gray-200 px-6 py-2 hover:bg-gray-300;
+  }
+}
