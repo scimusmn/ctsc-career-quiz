@@ -1,6 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Gugi&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Iceberg&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -98,11 +95,5 @@
 
   img {
     -webkit-user-drag: none;
-  }
-}
-
-@layer components {
-  .btn {
-    @apply inline-block w-max rounded-md bg-gray-200 px-6 py-2 hover:bg-gray-300;
   }
 }

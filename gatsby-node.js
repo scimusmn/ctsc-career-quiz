@@ -54,7 +54,9 @@ exports.createPages = async ({ actions, graphql }) => {
   }
 
   const locales = allLocaleData.edges;
-  const quizzes = allQuizData.edges;
+  const quizzes = allQuizData.edges.filter(
+    ({ node }) => node.slug === 'career-quiz'
+  );
 
   // Create a homepage for each locale
   locales.forEach(({ node }) => {

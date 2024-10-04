@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import { graphql, navigate } from 'gatsby';
 import PropTypes from 'prop-types';
@@ -6,10 +5,6 @@ import QuestionContent from '../../components/Question/QuestionContent';
 import Intro from '../../components/Question/Intro';
 import useQuizStore from '../../store';
 import { useKeyPress } from '../../hooks';
-import ShipAdvisorQuestionContent from '../../components/ShipAdvisor/ShipAdvisorQuestionContent';
-import LifeDetectiveQuestionContent from '../../components/LifeDetective/LifeDetectiveQuestionContent';
-import TriviaQuestionIntro from '../../components/Trivia/TriviaQuestionIntro';
-import TriviaQuestionContent from '../../components/Trivia/TriviaQuestionContent';
 
 export const pageQuery = graphql`
   query ($locale: String!, $slug: String!, $id: String!) {
@@ -171,65 +166,28 @@ function QuestionScreen({ data, location }) {
 
   const { pathname } = location;
 
-  useKeyPress(['Escape'], () => navigate(`/${currentLocale}/home/`)); // exit quiz on escape
+  useKeyPress(['Escape'], () =>
+    navigate(`/${currentLocale}/${contentfulQuiz.slug}`)
+  ); // exit quiz & go back to intro screen, on escape
 
-  if (contentfulQuiz.slug === 'trivia') {
-    if (started || !contentfulQuestion.questionIntro) {
-      return (
-        <TriviaQuestionContent
+  return (
+    <div>
+      {started || !contentfulQuestion.questionIntro ? (
+        <QuestionContent
           content={contentfulQuestion}
           parentQuiz={contentfulQuiz}
           currentPath={pathname}
+          totalQuestions={
+            contentfulQuiz.listOfQuestionSets[0].listOfQuestions.length
+          }
         />
-      );
-    }
-
-    return (
-      <TriviaQuestionIntro
-        content={contentfulQuestion.questionIntro}
-        startQuestion={() => setStarted(true)}
-      />
-    );
-  }
-
-  return (
-    <>
-      <div>
-        {started || !contentfulQuestion.questionIntro ? (
-          contentfulQuiz.slug === 'ship-advisor' ? (
-            <ShipAdvisorQuestionContent
-              content={contentfulQuestion}
-              parentQuiz={contentfulQuiz}
-              currentPath={pathname}
-            />
-          ) : contentfulQuiz.slug === 'life-detective' ? (
-            <LifeDetectiveQuestionContent
-              content={contentfulQuestion}
-              parentQuiz={contentfulQuiz}
-              currentPath={pathname}
-            />
-          ) : (
-            <QuestionContent
-              content={contentfulQuestion}
-              parentQuiz={contentfulQuiz}
-              currentPath={pathname}
-            />
-          )
-        ) : (
-          <Intro
-            content={contentfulQuestion.questionIntro}
-            startQuestion={() => setStarted(true)}
-          />
-        )}
-      </div>
-
-      {contentfulQuiz.slug !== 'ship-advisor' &&
-        contentfulQuiz.slug !== 'life-detective' && (
-          <div className='fixed bottom-10 left-[50%] -translate-x-1/2 rounded-md bg-blue-200 p-2'>
-            Press `space` to skip to the next step
-          </div>
-        )}
-    </>
+      ) : (
+        <Intro
+          content={contentfulQuestion.questionIntro}
+          startQuestion={() => setStarted(true)}
+        />
+      )}
+    </div>
   );
 }
 
