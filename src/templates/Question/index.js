@@ -7,8 +7,11 @@ import useQuizStore from '../../store';
 import { useKeyPress } from '../../hooks';
 
 export const pageQuery = graphql`
-  query ($locale: String!, $slug: String!, $id: String!) {
-    contentfulQuestion(id: { eq: $id }, node_locale: { eq: $locale }) {
+  query ($locale: String!, $slug: String!, $contentful_id: String!) {
+    contentfulQuestion(
+      contentful_id: { eq: $contentful_id }
+      node_locale: { eq: $locale }
+    ) {
       text {
         text
       }
@@ -21,20 +24,20 @@ export const pageQuery = graphql`
         tags
         image {
           title
-          description
           file {
             contentType
             url
           }
+          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
       }
       media {
         title
-        description
         file {
           contentType
           url
         }
+        gatsbyImageData(width: 1920, layout: CONSTRAINED)
       }
       hint
       voiceOverAudio {
@@ -52,11 +55,11 @@ export const pageQuery = graphql`
         }
         media {
           title
-          description
           file {
             contentType
             url
           }
+          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
         voiceOverAudio {
           title
@@ -88,11 +91,11 @@ export const pageQuery = graphql`
         }
         media {
           title
-          description
           file {
             contentType
             url
           }
+          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
       }
     }
@@ -114,6 +117,7 @@ export const pageQuery = graphql`
           contentType
           url
         }
+        gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
       }
       quizSettings {
         title

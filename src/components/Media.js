@@ -1,37 +1,56 @@
+/* eslint-disable react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 
-export default function Media({ media, className = 'max-w-sm mt-2 w-full' }) {
-  if (!media || !media.file) {
+export default function Media({ media, className = 'w-full' }) {
+  if (!media) {
     console.warn('Media component received invalid media prop');
     return null;
   }
 
-  const mediaType = media.file.contentType.split('/')[0];
+  // Check if we are dealing with a Gatsby-optimized image (gatsbyImageData) or a raw file (e.g., video or SVG)
+  const isGatsbyImage = media.gatsbyImageData;
 
-  return mediaType === 'image' ? (
-    <img src={media.file.url} alt={media.title} className={className} />
-  ) : (
-    // eslint-disable-next-line jsx-a11y/media-has-caption
-    <video>
-      <source
-        src={media.file.url}
-        type={media.file.contentType}
+  // Handle Gatsby-optimized images
+  if (isGatsbyImage) {
+    const imageData = getImage(media); // Get optimized image
+    return (
+      <GatsbyImage
+        image={imageData}
+        alt={media.title || 'Media'}
         className={className}
       />
-    </video>
-  );
+    );
+  }
+
+  // Handle SVGs separately, as they can be rendered directly in an <img> tag or embedded inline
+  if (media.file && media.file.contentType === 'image/svg+xml') {
+    return <img src={media.file.url} alt={media.title} className={className} />;
+  }
+
+  // Fallback to handling video files or other media types with raw file URLs
+  if (media.file && media.file.contentType.startsWith('video')) {
+    return (
+      // eslint-disable-next-line jsx-a11y/media-has-caption
+      <video className={className} muted autoPlay loop>
+        <source src={media.file.url} type={media.file.contentType} />
+      </video>
+    );
+  }
+
+  console.warn('Unsupported media type');
+  return null;
 }
 
 Media.propTypes = {
-  // eslint-disable-next-line react/require-default-props
   className: PropTypes.string,
   media: PropTypes.shape({
     title: PropTypes.string,
-    description: PropTypes.string,
+    gatsbyImageData: PropTypes.object,
     file: PropTypes.shape({
-      contentType: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    }).isRequired,
+      contentType: PropTypes.string,
+      url: PropTypes.string,
+    }),
   }).isRequired,
 };

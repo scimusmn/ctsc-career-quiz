@@ -7,8 +7,11 @@ import VoiceOverWithText from '../../components/VoiceOverWithText';
 import Media from '../../components/Media';
 
 export const pageQuery = graphql`
-  query ($id: String!, $slug: String!, $locale: String!) {
-    contentfulScoreScreen(id: { eq: $id }, node_locale: { eq: $locale }) {
+  query ($contentful_id: String!, $slug: String!, $locale: String!) {
+    contentfulScoreScreen(
+      contentful_id: { eq: $contentful_id }
+      node_locale: { eq: $locale }
+    ) {
       title
       retryButtonText
       results {
@@ -25,11 +28,11 @@ export const pageQuery = graphql`
         }
         backgroundMedia {
           title
-          description
           file {
             contentType
             url
           }
+          gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
         }
         scoreKey
         tallyKey
