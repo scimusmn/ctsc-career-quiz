@@ -34,7 +34,6 @@ exports.createPages = async ({ actions, graphql }) => {
         node_locale
         homeScreen {
           contentful_id
-          showHomeScreen
         }
         quizzes {
           title
@@ -62,19 +61,16 @@ exports.createPages = async ({ actions, graphql }) => {
   const appNode = applicationData;
 
   locales.forEach(({ node: localeNode }) => {
-    // Create a page for the Home Screen if showHomeScreen is true
-    if (appNode.homeScreen?.showHomeScreen) {
-      const homePath = `/${localeNode.code}/home`;
-      createPage({
-        path: homePath,
-        component: path.resolve('./src/templates/Homepage/index.js'),
-        context: {
-          contentful_id: appNode.homeScreen.contentful_id,
-          locale: localeNode.code,
-          appSlug: appNode.slug,
-        },
-      });
-    }
+    const homePath = `/${localeNode.code}/home`;
+    createPage({
+      path: homePath,
+      component: path.resolve('./src/templates/Homepage/index.js'),
+      context: {
+        contentful_id: appNode.homeScreen?.contentful_id,
+        locale: localeNode.code,
+        appSlug: appNode.slug,
+      },
+    });
 
     // Create a page for each quiz in the application
     appNode.quizzes.forEach(quizNode => {

@@ -22,15 +22,8 @@ export const pageQuery = graphql`
           url
           contentType
         }
-        gatsbyImageData(width: 1080, height: 1920, layout: FIXED)
+        gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
       }
-      # application {
-      #   quizzes {
-      #     slug
-      #     node_locale
-      #     title
-      #   }
-      # }
     }
 
     contentfulApplication(
