@@ -1,18 +1,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Link, graphql, navigate } from 'gatsby';
+import { graphql, navigate } from 'gatsby';
 import PropTypes from 'prop-types';
 import { useKeyPress } from '../../hooks';
 import useQuizStore from '../../store';
-import TallyResult from '../../components/Result/TallyResult';
-import ScoreResult from '../../components/Result/ScoreResult';
 import VoiceOverWithText from '../../components/VoiceOverWithText';
-import ShipAdvisorResult from '../../components/ShipAdvisor/ShipAdvisorResult';
-import LifeDetectiveResult from '../../components/LifeDetective/LifeDetectiveResult';
-import TriviaResult from '../../components/Trivia/TriviaResult';
+import Media from '../../components/Media';
 
 export const pageQuery = graphql`
-  query ($id: String!, $slug: String!, $locale: String!) {
-    contentfulScoreScreen(id: { eq: $id }, node_locale: { eq: $locale }) {
+  query ($contentful_id: String!, $slug: String!, $locale: String!) {
+    contentfulScoreScreen(
+      contentful_id: { eq: $contentful_id }
+      node_locale: { eq: $locale }
+    ) {
       title
       retryButtonText
       results {
@@ -29,11 +28,11 @@ export const pageQuery = graphql`
         }
         backgroundMedia {
           title
-          description
           file {
             contentType
             url
           }
+          gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
         }
         scoreKey
         tallyKey
@@ -54,7 +53,7 @@ export const pageQuery = graphql`
 
 function ResultScreen({ data }) {
   const { quizSettings } = data.contentfulQuiz;
-  const { title, retryButtonText, results } = data.contentfulScoreScreen;
+  const { results } = data.contentfulScoreScreen;
   const { scores, tagTallies } = useQuizStore();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [shouldPlayAudio, setShouldPlayAudio] = useState(true);
@@ -90,17 +89,15 @@ function ResultScreen({ data }) {
   }, [isLastPlayer]);
 
   useKeyPress([' '], () => {
-    if (data.contentfulQuiz.slug !== 'life-detective') {
-      setShouldPlayAudio(false);
-      handleNextPlayer();
-    }
+    setShouldPlayAudio(false);
+    handleNextPlayer();
   });
 
   useEffect(() => {
     setShouldPlayAudio(true);
   }, [currentPlayerIndex]);
 
-  const currentPlayer = quizSettings.players[currentPlayerIndex];
+  // const currentPlayer = quizSettings.players[currentPlayerIndex];
   const currentPlayerKey = `p${currentPlayerIndex + 1}`;
 
   const currentResult = quizSettings.isTallyBased
@@ -109,118 +106,33 @@ function ResultScreen({ data }) {
 
   const hasVoiceOver = !!currentResult?.voiceOverAudio?.file?.url;
 
-  if (data.contentfulQuiz.slug === 'ship-advisor') {
-    return (
-      <>
-        <ShipAdvisorResult
-          result={currentResult}
-          retryButtonText={retryButtonText}
-        />
-        {hasVoiceOver && shouldPlayAudio && (
-          <VoiceOverWithText
-            key={currentPlayerIndex} // Force re-render by changing the key
-            content={{
-              voiceOverAudio: currentResult.voiceOverAudio,
-            }}
-            callback={() => {}}
-          />
-        )}
-      </>
-    );
-  }
-
-  if (data.contentfulQuiz.slug === 'life-detective') {
-    return (
-      <>
-        <LifeDetectiveResult
-          result={currentResult}
-          retryButtonText={retryButtonText}
-          score={scores[currentPlayerKey] || 0}
-        />
-
-        {hasVoiceOver && shouldPlayAudio && (
-          <VoiceOverWithText
-            key={currentPlayerIndex} // Force re-render by changing the key
-            content={{
-              voiceOverAudio: currentResult.voiceOverAudio,
-            }}
-            callback={() => {}}
-          />
-        )}
-      </>
-    );
-  }
-
-  if (data.contentfulQuiz.slug === 'trivia') {
-    return (
-      <>
-        <TriviaResult
-          result={currentResult}
-          retryButtonText={retryButtonText}
-          score={scores[currentPlayerKey] || 0}
-        />
-
-        {hasVoiceOver && shouldPlayAudio && (
-          <VoiceOverWithText
-            key={currentPlayerIndex} // Force re-render by changing the key
-            content={{
-              voiceOverAudio: currentResult.voiceOverAudio,
-            }}
-            callback={() => {}}
-          />
-        )}
-      </>
-    );
-  }
-
   return (
-    <div className='flex h-screen w-full items-center justify-center text-center'>
-      <div className='space-y-8'>
-        {title && <h1 className='text-4xl font-bold'>{title}</h1>}
+    <div className='flex min-h-screen w-full flex-col items-center justify-center font-GT-Walsheim text-white'>
+      {/* Background with baked in content */}
+      {currentResult?.backgroundMedia && (
+        <Media
+          media={currentResult.backgroundMedia}
+          className='fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
+        />
+      )}
 
-        {quizSettings.isTallyBased ? (
-          <TallyResult
-            tagTallies={tagTallies[currentPlayerKey]}
-            player={currentPlayer}
-            result={currentResult}
-          />
-        ) : (
-          <ScoreResult
-            score={scores[currentPlayerKey] || 0}
-            player={currentPlayer}
-            result={currentResult}
-          />
-        )}
+      {/* Result text */}
+      {currentResult?.text && (
+        <h1 className='absolute right-[94px] top-[151px] w-[835px] text-center text-[60px]/[68px] font-extrabold text-career-blue-100 [text-shadow:10px_8px_10px_#00000066]'>
+          {currentResult.text.text}
+        </h1>
+      )}
 
-        <div className='flex items-center justify-center gap-4'>
-          {quizSettings.players.length > 1 && !isLastPlayer && (
-            <button type='button' className='btn' onClick={handleNextPlayer}>
-              Next Player
-            </button>
-          )}
-
-          {(quizSettings.players.length === 1 || isLastPlayer) && (
-            <Link className='btn bg-red-200 hover:bg-red-300' to='/'>
-              {retryButtonText || 'Retry'}
-            </Link>
-          )}
-        </div>
-
-        {hasVoiceOver && shouldPlayAudio && (
-          <VoiceOverWithText
-            key={currentPlayerIndex} // Force re-render by changing the key
-            content={{
-              voiceOverAudio: currentResult.voiceOverAudio,
-            }}
-            callback={handleNextPlayer}
-          />
-        )}
-      </div>
-
-      <div className='fixed bottom-10 left-[50%] -translate-x-1/2 rounded-md bg-blue-200 p-2'>
-        Press `space` to{' '}
-        {isLastPlayer ? 'restart the quiz' : 'go to next player'}
-      </div>
+      {hasVoiceOver && shouldPlayAudio && (
+        <VoiceOverWithText
+          key={currentPlayerIndex} // Force re-render by changing the key
+          content={{
+            voiceOverAudio: currentResult.voiceOverAudio,
+          }}
+          // callback={handleNextPlayer}
+          callback={() => {}}
+        />
+      )}
     </div>
   );
 }

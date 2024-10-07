@@ -2,17 +2,10 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useKeyPress, useSoundEffect } from '../../hooks';
 import useQuizStore from '../../store';
-import Media from '../Media';
-import RichText from '../RichText';
-import WhoAnsweredState from '../Helper/WhoAnsweredState';
-import ShipAdvisorOptionsContent from '../ShipAdvisor/ShipAdvisorOptionsContent';
-import LifeDetectiveOptionsContent from '../LifeDetective/LifeDetectiveOptionsContent';
-import TriviaOptionsContent from '../Trivia/TriviaOptionsContent';
 
 function Options({
   options,
   currentQuizSettings,
-  currentQuizSlug,
   isSolutionPhase,
   revealSolution,
 }) {
@@ -151,82 +144,26 @@ function Options({
     }
   }, [selectedOptionIndex, isSolutionPhase]);
 
-  if (currentQuizSlug === 'ship-advisor') {
-    return (
-      <ShipAdvisorOptionsContent
-        options={options}
-        currentQuizSettings={currentQuizSettings}
-        handleSinglePlayerClick={handleSinglePlayerClick}
-        isSolutionPhase={isSolutionPhase}
-      />
-    );
-  }
-
-  if (currentQuizSlug === 'life-detective') {
-    return (
-      <LifeDetectiveOptionsContent
-        options={options}
-        currentQuizSettings={currentQuizSettings}
-        handleSinglePlayerClick={handleSinglePlayerClick}
-        isSolutionPhase={isSolutionPhase}
-      />
-    );
-  }
-
-  if (currentQuizSlug === 'trivia') {
-    return (
-      <TriviaOptionsContent
-        options={options}
-        currentQuizSettings={currentQuizSettings}
-        handleSinglePlayerClick={handleSinglePlayerClick}
-        isSolutionPhase={isSolutionPhase}
-      />
-    );
-  }
-
   return (
-    <>
-      <div className='mt-8 space-y-2'>
-        <h3 className='text-xl font-bold'>Options</h3>
-        <div className='flex max-w-xs flex-col gap-2'>
-          {options &&
-            options.map((option, index) => (
-              <div
-                // eslint-disable-next-line react/no-array-index-key
-                key={`${option.text}-${index}`}
-                className='flex items-center gap-4'
-              >
-                <button
-                  type='button'
-                  disabled={isSolutionPhase}
-                  onClick={() => handleSinglePlayerClick(index)}
-                  className={`btn w-full disabled:pointer-events-none ${isSolutionPhase && option.isCorrect && 'bg-green-200'} `}
-                >
-                  <div>
-                    {option.richText ? (
-                      <RichText content={option.richText} />
-                    ) : (
-                      option.text
-                    )}
-                  </div>
-                  {option.image && <Media media={option.image} />}
-                </button>
-                <span>
-                  {!currentQuizSettings.isTallyBased &&
-                    isSolutionPhase &&
-                    (option.isCorrect ? '✅' : '❌')}
-                </span>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* State of players and questions answered */}
-      <WhoAnsweredState
-        selectedOptionIndex={selectedOptionIndex}
-        currentQuizSettings={currentQuizSettings}
-      />
-    </>
+    <div className='mx-auto mt-auto grid w-[1320px] grid-cols-2 content-center gap-x-[92px] gap-y-[52px] pb-[100px]'>
+      {options &&
+        options.map((option, index) => (
+          <button
+            // eslint-disable-next-line react/no-array-index-key
+            key={`${option.text}-${index}`}
+            type='button'
+            disabled={isSolutionPhase}
+            onClick={() => handleSinglePlayerClick(index)}
+            className={`min-h-[138px] w-full rounded-[30px] border-[5px] px-[5px] active:scale-95 active:bg-white/60 disabled:pointer-events-none ${isSolutionPhase && selectedOptionIndex.p1 === index ? 'border-career-blue-100 bg-career-blue-500/80' : 'border-white/70 bg-white/70'} `}
+          >
+            <span
+              className={`text-[40px]/[45px] font-bold ${isSolutionPhase && selectedOptionIndex.p1 === index && 'font-extrabold text-white [text-shadow:4px_4px_4px_#00000066]'}`}
+            >
+              {option.text}
+            </span>
+          </button>
+        ))}
+    </div>
   );
 }
 
@@ -235,7 +172,6 @@ export default Options;
 Options.propTypes = {
   options: PropTypes.instanceOf(Array).isRequired,
   currentQuizSettings: PropTypes.instanceOf(Object).isRequired,
-  currentQuizSlug: PropTypes.string.isRequired,
   isSolutionPhase: PropTypes.bool.isRequired,
   revealSolution: PropTypes.func.isRequired,
 };

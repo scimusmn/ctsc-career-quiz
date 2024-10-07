@@ -18,7 +18,7 @@ function LocaleSwitcher() {
 
   const locales = data.allContentfulLocale.edges;
 
-  const { currentLocale, setCurrentLocale } = useQuizStore();
+  const { setCurrentLocale } = useQuizStore();
   // Get the current page pathname and split into array of valid strings
   const currentPathname =
     typeof window !== 'undefined' ? window.location.pathname : '';
@@ -33,48 +33,25 @@ function LocaleSwitcher() {
     }
   };
 
-  const content = {
-    'en-US': {
-      title: 'Notification',
-      subtitle: 'Tap here to continue in English',
-    },
-    es: {
-      title: 'Notificación',
-      subtitle: 'Toca aquí para continuar en español',
-    },
-  };
-
   return (
-    <div className='flex w-[950px] flex-col gap-[31px]'>
+    <>
+      <hr className='mb-4 mt-10' />
+      <h2 className='mb-2 text-xl font-bold'>Switch Locale</h2>
+
       {/* Update the path as per your localized URL structure */}
-
-      {locales.map(({ node }) => (
-        <button
-          type='button'
-          key={node.code}
-          onClick={() => handleLocaleChange(node.code)}
-          className='flex items-center gap-[30px] rounded-[34px] bg-white/30 px-[38px] py-[52px] backdrop-blur-[3px]'
-        >
-          <img
-            src='/locale_icon.png'
-            alt='icon'
-            className='size-[85px] rounded-[10px] object-cover'
-          />
-
-          <div
-            className={`flex flex-col gap-2 text-left ${currentLocale === node.code && 'text-[#F6E4C8]'}`}
+      <div className='flex gap-8'>
+        {locales.map(({ node }) => (
+          <button
+            type='button'
+            key={node.code}
+            className='underline'
+            onClick={() => handleLocaleChange(node.code)}
           >
-            <span className='text-[40px]/[45.8px] font-bold'>
-              {content[node.code].title}
-            </span>
-
-            <span className='text-[45px]/[51.53px] font-normal'>
-              {content[node.code].subtitle}
-            </span>
-          </div>
-        </button>
-      ))}
-    </div>
+            {node.name}
+          </button>
+        ))}
+      </div>
+    </>
   );
 }
 

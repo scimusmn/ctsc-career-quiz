@@ -9,7 +9,16 @@ module.exports = {
     title: 'app-template',
   },
   plugins: [
-    'gatsby-plugin-sharp',
+    {
+      resolve: `gatsby-plugin-sharp`,
+      options: {
+        defaults: {
+          formats: [`auto`, `webp`],
+          placeholder: `dominantColor`,
+          backgroundColor: `transparent`,
+        },
+      },
+    },
     'gatsby-transformer-sharp',
     'gatsby-plugin-eslint',
     'gatsby-plugin-image',

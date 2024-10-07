@@ -4,16 +4,11 @@ import { graphql, navigate } from 'gatsby';
 import Home from '../../components/Home';
 
 export const pageQuery = graphql`
-  query ($locale: String!) {
-    allContentfulQuiz(filter: { node_locale: { eq: $locale } }) {
-      nodes {
-        title
-        slug
-        node_locale
-      }
-    }
-
-    contentfulHomeScreen(node_locale: { eq: $locale }) {
+  query ($contentful_id: String!, $locale: String!, $appSlug: String!) {
+    contentfulHomeScreen(
+      contentful_id: { eq: $contentful_id }
+      node_locale: { eq: $locale }
+    ) {
       title
       node_locale
       startButtonText
@@ -23,20 +18,32 @@ export const pageQuery = graphql`
       }
       backgroundMedia {
         title
-        description
         file {
           url
           contentType
         }
+        gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
+      }
+    }
+
+    contentfulApplication(
+      slug: { eq: $appSlug }
+      quizzes: { elemMatch: { node_locale: { eq: $locale } } }
+    ) {
+      quizzes {
+        slug
+        node_locale
+        title
       }
     }
   }
 `;
 
 function Homepage({ data }) {
-  const { contentfulHomeScreen, allContentfulQuiz } = data;
+  const { contentfulHomeScreen, contentfulApplication } = data;
   const { showHomeScreen, node_locale: locale } = contentfulHomeScreen || {};
-  const quizzes = allContentfulQuiz?.nodes || [];
+
+  const quizzes = contentfulApplication?.quizzes || [];
 
   useEffect(() => {
     if (quizzes.length === 1 || showHomeScreen === false) {
@@ -48,23 +55,11 @@ function Homepage({ data }) {
     return <div>Redirecting...</div>; // Or any loading indicator
   }
 
-  return <Home data={data} />;
+  return <Home content={contentfulHomeScreen} quizzes={quizzes} />;
 }
 
 Homepage.propTypes = {
-  data: PropTypes.shape({
-    contentfulHomeScreen: PropTypes.shape({
-      showHomeScreen: PropTypes.bool,
-      node_locale: PropTypes.string,
-    }),
-    allContentfulQuiz: PropTypes.shape({
-      nodes: PropTypes.arrayOf(
-        PropTypes.shape({
-          slug: PropTypes.string,
-        })
-      ),
-    }),
-  }).isRequired,
+  data: PropTypes.objectOf(PropTypes.object).isRequired,
 };
 
 export default Homepage;

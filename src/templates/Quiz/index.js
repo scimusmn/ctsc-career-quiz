@@ -3,101 +3,113 @@ import PropTypes from 'prop-types';
 import { graphql, navigate } from 'gatsby';
 import { useKeyPress } from '../../hooks';
 import Media from '../../components/Media';
-import LocaleSwitcher from '../../components/LocaleSwitcher';
 import useQuizStore from '../../store';
-import ShipAdvisorIntro from '../../components/ShipAdvisor/ShipAdvisorIntro';
-import LifeDetectiveIntro from '../../components/LifeDetective/LifeDetectiveIntro';
-import TriviaIntro from '../../components/Trivia/TriviaIntro';
 
 export const pageQuery = graphql`
-  query ($slug: String!, $locale: String!) {
-    contentfulQuiz(slug: { eq: $slug }, node_locale: { eq: $locale }) {
-      title
-      slug
-      locale: node_locale
-      text {
-        text
-      }
-      backgroundMedia {
+  query ($slug: String!) {
+    allContentfulQuiz(filter: { slug: { eq: $slug } }) {
+      nodes {
         title
-        description
-        file {
-          contentType
-          url
+        slug
+        locale: node_locale
+        text {
+          text
         }
-      }
-      listOfQuestionSets {
-        id
-      }
-      quizSettings {
-        players {
-          name
+        backgroundMedia {
+          title
+          file {
+            contentType
+            url
+          }
+          gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
         }
-        pointPerQuestion
-        isTallyBased
+        listOfQuestionSets {
+          id
+        }
+        quizSettings {
+          players {
+            name
+          }
+          pointPerQuestion
+          isTallyBased
+        }
       }
     }
   }
 `;
 
 function QuizScreen({ data }) {
-  const { contentfulQuiz } = data;
-  const { title, text, backgroundMedia } = contentfulQuiz;
-  const { startQuiz, currentLocale } = useQuizStore();
+  const { allContentfulQuiz } = data;
+  const quizEN = allContentfulQuiz.nodes.find(node => node.locale === 'en-US'); // English Quiz
+  const quizES = allContentfulQuiz.nodes.find(node => node.locale === 'es'); // Spanish Quiz
 
-  useKeyPress(
-    [' '],
-    () => contentfulQuiz.slug !== 'life-detective' && startQuiz(contentfulQuiz)
-  ); // start quiz on space bar (ignore on life detective quiz)
+  const { startQuiz, currentLocale, setCurrentLocale } = useQuizStore();
 
-  useKeyPress(['Escape'], () => navigate(`/${currentLocale}/home/`)); // exit quiz on escape
+  useKeyPress([' '], () => startQuiz(currentLocale === 'es' ? quizES : quizEN)); // start quiz on space bar
 
-  if (contentfulQuiz.slug === 'ship-advisor') {
-    return (
-      <ShipAdvisorIntro contentfulQuiz={contentfulQuiz} startQuiz={startQuiz} />
-    );
-  }
-
-  if (contentfulQuiz.slug === 'life-detective') {
-    return (
-      <LifeDetectiveIntro
-        contentfulQuiz={contentfulQuiz}
-        startQuiz={startQuiz}
-      />
-    );
-  }
-
-  if (contentfulQuiz.slug === 'trivia') {
-    return (
-      <TriviaIntro contentfulQuiz={contentfulQuiz} startQuiz={startQuiz} />
-    );
-  }
+  useKeyPress(['Escape'], () => navigate(`/`)); // exit quiz on escape
 
   return (
-    <>
-      <div className='flex min-h-screen w-full flex-col items-center justify-center gap-8 py-10 text-center'>
-        <h1 className='text-4xl font-bold'>{title} (Intro Screen)</h1>
-        {text && <p>{text.text}</p>}
+    <div className='flex min-h-screen w-full flex-col items-center justify-center text-center font-GT-Walsheim text-white'>
+      {/* Background Image */}
+      {(quizEN?.backgroundMedia || quizES?.backgroundMedia) && (
+        <Media
+          media={quizEN.backgroundMedia || quizES.backgroundMedia}
+          className='fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
+        />
+      )}
 
-        {backgroundMedia && <Media media={backgroundMedia} />}
+      {/* Headings */}
+      <div className='mb-[50px] text-[80px]/[91.5px] font-extrabold'>
+        {quizEN?.title && <h2>{quizEN.title}</h2>}
 
-        <button
-          type='button'
-          className='btn'
-          onClick={() => startQuiz(contentfulQuiz)}
-        >
-          Start Quiz
-        </button>
+        {quizES?.title && (
+          <h2 className='mt-[28px] text-career-blue-100'>{quizES.title}</h2>
+        )}
+      </div>
 
-        <div className='pb-20'>
-          <LocaleSwitcher />
+      {/* Body text */}
+      <div className='mb-[75px] w-[1401px] rounded-[50px] border-[10px] border-career-blue-400 p-[10px] shadow-[10px_10px_10px_10px_#00000033] backdrop-blur-[2px]'>
+        <div className='flex min-h-[318px] flex-col justify-center gap-[28px] rounded-[40px] border-[4px] border-career-blue-400 bg-black/30 px-[80px] text-[48px]/[55px] font-medium shadow-[10px_10px_10px_10px_#00000033]'>
+          {quizEN?.text && <p>{quizEN?.text.text}</p>}
+
+          {quizES?.text && (
+            <p className='text-career-blue-100'>{quizES?.text.text}</p>
+          )}
         </div>
       </div>
 
-      <div className='fixed bottom-10 left-[50%] -translate-x-1/2 rounded-md bg-blue-200 p-2'>
-        Press `space` to start the quiz
+      {/* Buttons to start the quiz */}
+      <div className='flex w-[1401px] justify-between'>
+        {/* English button */}
+        <button
+          type='button'
+          className='h-[92px] w-[394px] rounded-[30px] border-[5px] border-career-blue-100 bg-career-blue-500/80 active:scale-95 active:bg-career-blue-500/90'
+          onClick={() => {
+            setCurrentLocale('en-US');
+            startQuiz(quizEN);
+          }}
+        >
+          <span className='text-[40px] font-extrabold text-white [text-shadow:4px_4px_4px_#00000066]'>
+            Tap to begin
+          </span>
+        </button>
+
+        {/* Spanish button */}
+        <button
+          type='button'
+          className='h-[92px] w-[466px] rounded-[30px] border-[5px] border-career-blue-100 bg-career-blue-500/80 active:scale-95 active:bg-career-blue-500/90'
+          onClick={() => {
+            setCurrentLocale('es');
+            startQuiz(quizES);
+          }}
+        >
+          <span className='text-[40px] font-extrabold text-white [text-shadow:4px_4px_4px_#00000066]'>
+            Toca para comenzar
+          </span>
+        </button>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -1,4 +1,7 @@
 const path = require('path');
+const { APPLICATION_SLUG } = require('./appConfig');
+
+// Define the constant for the application slug
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
@@ -14,11 +17,8 @@ exports.onCreateWebpackConfig = ({ actions }) => {
 exports.createPages = async ({ actions, graphql }) => {
   const { createPage } = actions;
 
-  // language=GraphQL <- Enables code formatting for Gatsby's unique GraphQL function
   const {
-    // Query Contentful content types that render to a page
-    // The slug field is the bare minimum required for page creation
-    data: { allLocaleData, allQuizData },
+    data: { allLocaleData, applicationData },
     errors,
   } = await graphql(`
     {
@@ -29,20 +29,24 @@ exports.createPages = async ({ actions, graphql }) => {
           }
         }
       }
-      allQuizData: allContentfulQuiz {
-        edges {
-          node {
-            slug
-            node_locale
-            listOfQuestionSets {
-              id
-              listOfQuestions {
-                id
-              }
+      applicationData: contentfulApplication(slug: { eq: "${APPLICATION_SLUG}" }) {
+        slug
+        node_locale
+        homeScreen {
+          contentful_id
+        }
+        quizzes {
+          title
+          slug
+          node_locale
+          listOfQuestionSets {
+            contentful_id
+            listOfQuestions {
+              contentful_id
             }
-            scoreScreen {
-              id
-            }
+          }
+          scoreScreen {
+            contentful_id
           }
         }
       }
@@ -54,68 +58,60 @@ exports.createPages = async ({ actions, graphql }) => {
   }
 
   const locales = allLocaleData.edges;
-  const quizzes = allQuizData.edges;
+  const appNode = applicationData;
 
-  // Create a homepage for each locale
-  locales.forEach(({ node }) => {
-    const localeHomePath = `/${node.code}/home/`;
+  locales.forEach(({ node: localeNode }) => {
+    const homePath = `/${localeNode.code}/home`;
     createPage({
-      path: localeHomePath,
+      path: homePath,
       component: path.resolve('./src/templates/Homepage/index.js'),
       context: {
-        locale: node.code,
+        contentful_id: appNode.homeScreen?.contentful_id,
+        locale: localeNode.code,
+        appSlug: appNode.slug,
       },
     });
-  });
 
-  quizzes.forEach(({ node: quizNode }) => {
-    locales.forEach(({ node: localeNode }) => {
-      if (quizNode.node_locale === localeNode.code) {
-        // Create a page for each quiz
-        const quizPath = `/${localeNode.code}/${quizNode.slug}`;
+    // Create a page for each quiz in the application
+    appNode.quizzes.forEach(quizNode => {
+      const quizPath = `/${localeNode.code}/${quizNode.slug}`;
+      createPage({
+        path: quizPath,
+        component: path.resolve('./src/templates/Quiz/index.js'),
+        context: {
+          slug: quizNode.slug,
+          locale: localeNode.code,
+        },
+      });
+
+      // Nested loop to create pages for each question in the quiz
+      quizNode.listOfQuestionSets?.forEach((questionSet, questionSetIndex) => {
+        questionSet.listOfQuestions.forEach((question, questionIndex) => {
+          const questionPath = `${quizPath}/${questionSetIndex + 1}/${questionIndex + 1}`;
+          createPage({
+            path: questionPath,
+            component: path.resolve('./src/templates/Question/index.js'),
+            context: {
+              slug: quizNode.slug,
+              locale: localeNode.code,
+              contentful_id: question.contentful_id,
+            },
+          });
+        });
+      });
+
+      // Create a result page for the quiz
+      if (quizNode.scoreScreen?.contentful_id) {
+        const resultPath = `${quizPath}/result`;
         createPage({
-          path: quizPath,
-          component: path.resolve('./src/templates/Quiz/index.js'),
+          path: resultPath,
+          component: path.resolve('./src/templates/Result/index.js'),
           context: {
             slug: quizNode.slug,
+            contentful_id: quizNode.scoreScreen.contentful_id,
             locale: localeNode.code,
           },
         });
-
-        // Nested loop to create pages for each question
-        quizNode.listOfQuestionSets?.forEach(
-          (questionSet, questionSetIndex) => {
-            questionSet.listOfQuestions.forEach((question, questionIndex) => {
-              const questionPath = `${quizPath}/${questionSetIndex + 1}/${
-                questionIndex + 1
-              }`;
-
-              createPage({
-                path: questionPath,
-                component: path.resolve('./src/templates/Question/index.js'),
-                context: {
-                  slug: quizNode.slug,
-                  locale: localeNode.code,
-                  questionSetId: questionSet.id,
-                  id: question.id,
-                },
-              });
-            });
-          }
-        );
-
-        // create pages for each quiz result
-        if (quizNode.scoreScreen?.id) {
-          createPage({
-            path: `${quizPath}/result`,
-            component: path.resolve('./src/templates/Result/index.js'),
-            context: {
-              slug: quizNode.slug,
-              id: quizNode.scoreScreen.id,
-              locale: localeNode.code,
-            },
-          });
-        }
       }
     });
   });
