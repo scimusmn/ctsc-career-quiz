@@ -29,13 +29,15 @@ function QuestionContent({ content, parentQuiz, currentPath, totalQuestions }) {
   });
 
   // Get the current question index from the URL path
-  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  const pathSegments =
+    typeof window !== 'undefined' &&
+    window.location.pathname.split('/').filter(Boolean);
   const questionIndex = pathSegments[pathSegments.length - 1];
 
   // Effect for handling inactivity
   useEffect(() => {
     if (phase === QuestionPhase.SOLUTION && inactivityCount === 2) {
-      window.location.replace('/');
+      if (typeof window !== 'undefined') window.location.replace('/');
     }
   }, [phase, inactivityCount]);
 
@@ -46,7 +48,7 @@ function QuestionContent({ content, parentQuiz, currentPath, totalQuestions }) {
         {media && (
           <Media
             media={media}
-            className='fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
+            className='!fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
           />
         )}
 
