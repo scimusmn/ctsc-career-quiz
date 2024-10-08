@@ -1,5 +1,5 @@
 import React from 'react';
-import { navigate, graphql, useStaticQuery } from 'gatsby';
+import { navigate, graphql, useStaticQuery, Link } from 'gatsby';
 import { useKeyPress } from '../hooks';
 import useQuizStore from '../store';
 import { APPLICATION_SLUG } from '../../appConfig';
@@ -104,7 +104,10 @@ function IndexPage() {
   }
 
   return (
-    <div className='flex min-h-screen w-full flex-col items-center justify-end text-center font-GT-Walsheim text-white'>
+    <Link
+      to={linkTo}
+      className='flex min-h-screen w-full flex-col items-center justify-end text-center font-GT-Walsheim text-white'
+    >
       {/* Background Image */}
       {(attractScreenEN?.backgroundMedia ||
         attractScreenES?.backgroundMedia) && (
@@ -112,7 +115,7 @@ function IndexPage() {
           media={
             attractScreenEN?.backgroundMedia || attractScreenES?.backgroundMedia
           }
-          className='fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
+          className='!fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
         />
       )}
 
@@ -139,7 +142,7 @@ function IndexPage() {
           className='z-10'
         />
       </div>
-    </div>
+    </Link>
   );
 }
 

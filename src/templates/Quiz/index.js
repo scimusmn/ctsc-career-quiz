@@ -55,7 +55,7 @@ function QuizScreen({ data }) {
       {(quizEN?.backgroundMedia || quizES?.backgroundMedia) && (
         <Media
           media={quizEN.backgroundMedia || quizES.backgroundMedia}
-          className='fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
+          className='!fixed left-0 top-0 -z-[1] h-[1080px] w-[1920px] bg-black object-cover'
         />
       )}
 
