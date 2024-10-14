@@ -28,7 +28,7 @@ module.exports = {
         },
       },
       animation: {
-        ticker: 'ticker 15s linear infinite',
+        ticker: 'ticker 22s linear infinite',
       },
     },
   },
