@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, navigate } from 'gatsby';
+import { useIdleTimer } from 'react-idle-timer';
 import { useKeyPress } from '../../hooks';
 import Media from '../../components/Media';
 import useQuizStore from '../../store';
+import { INACTIVITY_TIMER } from '../../../appConfig';
 
 export const pageQuery = graphql`
   query ($slug: String!) {
@@ -44,6 +46,13 @@ function QuizScreen({ data }) {
   const quizES = allContentfulQuiz.nodes.find(node => node.locale === 'es'); // Spanish Quiz
 
   const { startQuiz, currentLocale, setCurrentLocale } = useQuizStore();
+
+  // quiz-level inactivity timer
+  useIdleTimer({
+    onIdle: () => navigate(`/`),
+    timeout: INACTIVITY_TIMER,
+    throttle: 500,
+  });
 
   useKeyPress([' '], () => startQuiz(currentLocale === 'es' ? quizES : quizEN)); // start quiz on space bar
 

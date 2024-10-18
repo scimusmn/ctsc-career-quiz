@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React from 'react';
 import { navigate, graphql, useStaticQuery, Link } from 'gatsby';
 import { useKeyPress } from '../hooks';
@@ -41,6 +42,25 @@ function IndexPage() {
       }
     }
   `);
+
+  // Carousel Icons
+  const professionIcons = [
+    '/profession/1.png',
+    '/profession/2.png',
+    '/profession/3.png',
+    '/profession/4.png',
+    '/profession/5.png',
+    '/profession/6.png',
+    '/profession/7.png',
+    '/profession/8.png',
+    '/profession/10.png',
+    '/profession/11.png',
+    '/profession/12.png',
+    '/profession/13.png',
+    '/profession/14.png',
+    '/profession/15.png',
+    '/profession/16.png',
+  ];
 
   // Find the specific application
   const application = data.allContentfulApplication.nodes.filter(
@@ -133,14 +153,26 @@ function IndexPage() {
       </div>
 
       {/* Profession Icons */}
-      <div className='relative flex h-[266px] items-center justify-center p-[30px]'>
-        <div className='absolute inset-0 bg-career-blue-300/80 mix-blend-luminosity' />
+      <div className='relative flex h-[266px] w-full overflow-hidden'>
+        <div className='absolute inset-0 -z-[1] bg-career-blue-300/80 mix-blend-luminosity' />
 
-        <img
-          src='/attract_icons.png'
-          alt='professions icons'
-          className='z-10'
-        />
+        <div className='flex min-w-full flex-[0_0_auto] animate-ticker items-center gap-2'>
+          {professionIcons.map((src, index) => (
+            <img key={src + index} src={src} alt='professions icons' />
+          ))}
+        </div>
+        <div
+          className='flex min-w-full flex-[0_0_auto] animate-ticker items-center gap-2'
+          aria-hidden='true'
+        >
+          {professionIcons.map((src, index) => (
+            <img
+              key={`second-${src}${index}`}
+              src={src}
+              alt='professions icons'
+            />
+          ))}
+        </div>
       </div>
     </Link>
   );

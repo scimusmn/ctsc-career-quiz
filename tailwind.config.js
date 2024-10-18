@@ -20,6 +20,16 @@ module.exports = {
       fontFamily: {
         'GT-Walsheim': 'GT Walsheim',
       },
+
+      keyframes: {
+        ticker: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
+      animation: {
+        ticker: 'ticker 22s linear infinite',
+      },
     },
   },
   plugins: [],
