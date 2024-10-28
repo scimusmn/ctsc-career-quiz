@@ -41,6 +41,7 @@ export const pageQuery = graphql`
 
     contentfulQuiz(slug: { eq: $slug }, node_locale: { eq: $locale }) {
       slug
+      node_locale
       quizSettings {
         isTallyBased
         players {
@@ -52,7 +53,7 @@ export const pageQuery = graphql`
 `;
 
 function ResultScreen({ data }) {
-  const { quizSettings } = data.contentfulQuiz;
+  const { quizSettings, node_locale: locale } = data.contentfulQuiz;
   const { results } = data.contentfulScoreScreen;
   const { scores, tagTallies } = useQuizStore();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -122,6 +123,16 @@ function ResultScreen({ data }) {
           {currentResult.text.text}
         </h1>
       )}
+
+      <button
+        type='button'
+        onClick={handleNextPlayer}
+        className='absolute bottom-[117px] left-[386px] h-[51px] w-[255px] rounded-[30px] border-[4px] border-career-blue-100 bg-career-blue-500/80 active:scale-95 active:bg-career-blue-500/90'
+      >
+        <span className='text-[24px] font-bold text-white [text-shadow:4px_4px_4px_#00000066]'>
+          {locale === 'es' ? 'Intenta de nuevo' : 'Try again'}
+        </span>
+      </button>
 
       {hasVoiceOver && shouldPlayAudio && (
         <VoiceOverWithText
