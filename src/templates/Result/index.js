@@ -53,8 +53,8 @@ export const pageQuery = graphql`
 `;
 
 function ResultScreen({ data }) {
-  const { quizSettings, node_locale: locale } = data.contentfulQuiz;
-  const { results } = data.contentfulScoreScreen;
+  const { quizSettings } = data.contentfulQuiz;
+  const { results, retryButtonText } = data.contentfulScoreScreen;
   const { scores, tagTallies } = useQuizStore();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [shouldPlayAudio, setShouldPlayAudio] = useState(true);
@@ -138,7 +138,7 @@ function ResultScreen({ data }) {
         className='absolute bottom-[117px] left-[386px] h-[51px] w-[255px] rounded-[30px] border-[4px] border-career-blue-100 bg-career-blue-500/80 active:scale-95 active:bg-career-blue-500/90'
       >
         <span className='text-[24px] font-bold text-white [text-shadow:4px_4px_4px_#00000066]'>
-          {locale === 'es' ? 'Intenta de nuevo' : 'Try again'}
+          {retryButtonText}
         </span>
       </button>
 
@@ -148,7 +148,6 @@ function ResultScreen({ data }) {
           content={{
             voiceOverAudio: currentResult.voiceOverAudio,
           }}
-          // callback={handleNextPlayer}
           callback={() => {}}
         />
       )}
