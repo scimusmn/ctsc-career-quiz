@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useKeyPress, useSoundEffect } from '../../hooks';
 import useQuizStore from '../../store';
+import { preventWidow } from '../../helper';
 
 function Options({
   options,
@@ -159,7 +160,7 @@ function Options({
             <span
               className={`text-[40px]/[45px] font-bold ${isSolutionPhase && selectedOptionIndex.p1 === index && 'font-extrabold text-white [text-shadow:4px_4px_4px_#00000066]'}`}
             >
-              {option.text}
+              {preventWidow(option.text)}
             </span>
           </button>
         ))}

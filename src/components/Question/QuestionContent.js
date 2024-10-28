@@ -6,6 +6,7 @@ import useQuizStore from '../../store';
 import Options from './Options';
 import Media from '../Media';
 import VoiceOverWithText from '../VoiceOverWithText';
+import { preventWidow } from '../../helper';
 
 // Enumeration for question phases
 const QuestionPhase = {
@@ -68,7 +69,9 @@ function QuestionContent({ content, parentQuiz, currentPath, totalQuestions }) {
           </span>
 
           {/* Title */}
-          <h2 className='text-[70px]/[80px] font-bold'>{text?.text}</h2>
+          <h2 className='text-[70px]/[80px] font-bold'>
+            {preventWidow(text?.text)}
+          </h2>
 
           {/* Options */}
           {options && (
