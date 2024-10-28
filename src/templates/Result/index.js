@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { graphql, navigate } from 'gatsby';
 import PropTypes from 'prop-types';
+import { useIdleTimer } from 'react-idle-timer';
 import { useKeyPress } from '../../hooks';
 import useQuizStore from '../../store';
 import VoiceOverWithText from '../../components/VoiceOverWithText';
 import Media from '../../components/Media';
+import { INACTIVITY_TIMER } from '../../../appConfig';
 
 export const pageQuery = graphql`
   query ($contentful_id: String!, $slug: String!, $locale: String!) {
@@ -60,6 +62,13 @@ function ResultScreen({ data }) {
   const [shouldPlayAudio, setShouldPlayAudio] = useState(true);
 
   const isLastPlayer = currentPlayerIndex === quizSettings.players.length - 1;
+
+  // quiz-level inactivity timer
+  useIdleTimer({
+    onIdle: () => navigate(`/`),
+    timeout: INACTIVITY_TIMER,
+    throttle: 500,
+  });
 
   const getResult = useCallback(
     (score, tally) => {
