@@ -101,8 +101,16 @@ function ResultScreen({ data }) {
   // const currentPlayer = quizSettings.players[currentPlayerIndex];
   const currentPlayerKey = `p${currentPlayerIndex + 1}`;
 
+  // Find the key with highest value from tagTallies
+  const highestTallyKey =
+    quizSettings.isTallyBased &&
+    tagTallies[currentPlayerKey] &&
+    Object.entries(tagTallies[currentPlayerKey]).reduce((highest, current) =>
+      current[1] > highest[1] ? current : highest
+    )[0];
+
   const currentResult = quizSettings.isTallyBased
-    ? getResult(null, Object.keys(tagTallies[currentPlayerKey] || {})[0])
+    ? getResult(null, highestTallyKey)
     : getResult(scores[currentPlayerKey] || {}, null);
 
   const hasVoiceOver = !!currentResult?.voiceOverAudio?.file?.url;
