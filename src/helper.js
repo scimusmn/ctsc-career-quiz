@@ -31,4 +31,14 @@ export const parsePathname = pathname => {
   return parsed;
 };
 
+export const preventWidow = text => {
+  // Return an empty string if the input is falsy or if it's just whitespace
+  if (!text || !text.trim()) return '';
+
+  const words = text.trim().split(' ');
+  if (words.length < 2) return text;
+
+  return `${words.slice(0, -1).join(' ')}\u00A0${words.slice(-1)}`;
+};
+
 export const test = () => {};

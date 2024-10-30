@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { graphql, navigate } from 'gatsby';
 import PropTypes from 'prop-types';
+import { useIdleTimer } from 'react-idle-timer';
 import { useKeyPress } from '../../hooks';
 import useQuizStore from '../../store';
 import VoiceOverWithText from '../../components/VoiceOverWithText';
 import Media from '../../components/Media';
+import { INACTIVITY_TIMER } from '../../../appConfig';
 
 export const pageQuery = graphql`
   query ($contentful_id: String!, $slug: String!, $locale: String!) {
@@ -41,6 +43,7 @@ export const pageQuery = graphql`
 
     contentfulQuiz(slug: { eq: $slug }, node_locale: { eq: $locale }) {
       slug
+      node_locale
       quizSettings {
         isTallyBased
         players {
@@ -53,12 +56,19 @@ export const pageQuery = graphql`
 
 function ResultScreen({ data }) {
   const { quizSettings } = data.contentfulQuiz;
-  const { results } = data.contentfulScoreScreen;
+  const { results, retryButtonText } = data.contentfulScoreScreen;
   const { scores, tagTallies } = useQuizStore();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [shouldPlayAudio, setShouldPlayAudio] = useState(true);
 
   const isLastPlayer = currentPlayerIndex === quizSettings.players.length - 1;
+
+  // quiz-level inactivity timer
+  useIdleTimer({
+    onIdle: () => navigate(`/`),
+    timeout: INACTIVITY_TIMER,
+    throttle: 500,
+  });
 
   const getResult = useCallback(
     (score, tally) => {
@@ -100,8 +110,16 @@ function ResultScreen({ data }) {
   // const currentPlayer = quizSettings.players[currentPlayerIndex];
   const currentPlayerKey = `p${currentPlayerIndex + 1}`;
 
+  // Find the key with highest value from tagTallies
+  const highestTallyKey =
+    quizSettings.isTallyBased &&
+    tagTallies[currentPlayerKey] &&
+    Object.entries(tagTallies[currentPlayerKey]).reduce((highest, current) =>
+      current[1] > highest[1] ? current : highest
+    )[0];
+
   const currentResult = quizSettings.isTallyBased
-    ? getResult(null, Object.keys(tagTallies[currentPlayerKey] || {})[0])
+    ? getResult(null, highestTallyKey)
     : getResult(scores[currentPlayerKey] || {}, null);
 
   const hasVoiceOver = !!currentResult?.voiceOverAudio?.file?.url;
@@ -123,13 +141,22 @@ function ResultScreen({ data }) {
         </h1>
       )}
 
+      <button
+        type='button'
+        onClick={handleNextPlayer}
+        className='absolute bottom-[117px] left-[386px] h-[51px] w-[255px] rounded-[30px] border-[4px] border-career-blue-100 bg-career-blue-500/80 active:scale-95 active:bg-career-blue-500/90'
+      >
+        <span className='text-[24px] font-bold text-white [text-shadow:4px_4px_4px_#00000066]'>
+          {retryButtonText}
+        </span>
+      </button>
+
       {hasVoiceOver && shouldPlayAudio && (
         <VoiceOverWithText
           key={currentPlayerIndex} // Force re-render by changing the key
           content={{
             voiceOverAudio: currentResult.voiceOverAudio,
           }}
-          // callback={handleNextPlayer}
           callback={() => {}}
         />
       )}

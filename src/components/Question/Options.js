@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useKeyPress, useSoundEffect } from '../../hooks';
 import useQuizStore from '../../store';
+import { preventWidow } from '../../helper';
 
 function Options({
   options,
@@ -157,9 +158,9 @@ function Options({
             className={`min-h-[138px] w-full rounded-[30px] border-[5px] px-[5px] active:scale-95 active:bg-white/60 disabled:pointer-events-none ${isSolutionPhase && selectedOptionIndex.p1 === index ? 'border-career-blue-100 bg-career-blue-500/80' : 'border-white/70 bg-white/70'} `}
           >
             <span
-              className={`text-[40px]/[45px] font-bold ${isSolutionPhase && selectedOptionIndex.p1 === index && 'font-extrabold text-white [text-shadow:4px_4px_4px_#00000066]'}`}
+              className={`text-[40px]/[45px] font-bold ${isSolutionPhase && selectedOptionIndex.p1 === index && 'text-white [text-shadow:4px_4px_4px_#00000066]'}`}
             >
-              {option.text}
+              {preventWidow(option.text)}
             </span>
           </button>
         ))}
