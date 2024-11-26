@@ -24,11 +24,13 @@ function IndexPage() {
             }
             backgroundMedia {
               title
-              file {
-                url
-                contentType
+              localFile {
+                extension
+                publicURL
+                childImageSharp {
+                  gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
+                }
               }
-              gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
             }
           }
           homeScreen {

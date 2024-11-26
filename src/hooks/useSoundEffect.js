@@ -5,8 +5,8 @@ const useSoundEffect = (sound, loop = false) => {
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (sound?.file?.url) {
-      const newAudio = new Audio(sound.file.url);
+    if (sound?.localFile?.publicURL) {
+      const newAudio = new Audio(sound.localFile.publicURL);
       newAudio.loop = loop;
       newAudio.volume = 0.5;
       setAudio(newAudio);

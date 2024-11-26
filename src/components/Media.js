@@ -1,56 +1,58 @@
-/* eslint-disable react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 
 export default function Media({ media, className = 'w-full' }) {
-  if (!media) {
-    console.warn('Media component received invalid media prop');
+  if (!media?.localFile?.extension) {
+    console.warn('Media component received invalid or unsupported media prop');
     return null;
   }
 
-  // Check if we are dealing with a Gatsby-optimized image (gatsbyImageData) or a raw file (e.g., video or SVG)
-  const isGatsbyImage = media.gatsbyImageData;
+  const { extension, publicURL } = media.localFile;
+  const { title } = media;
 
-  // Handle Gatsby-optimized images
-  if (isGatsbyImage) {
-    const imageData = getImage(media); // Get optimized image
+  // Determine media type based on file extension
+  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'].includes(
+    extension.toLowerCase()
+  );
+  const isSvg = extension.toLowerCase() === 'svg';
+  const isVideo = ['mp4', 'webm', 'ogg'].includes(extension.toLowerCase());
+
+  // Render Gatsby-optimized images from localFile
+  if (isImage) {
+    const imageData = getImage(media.localFile); // Pass localFile directly
+    if (imageData) {
+      return (
+        <GatsbyImage
+          image={imageData}
+          alt={title || 'Media'}
+          className={className}
+        />
+      );
+    }
+  }
+
+  // Render SVGs directly
+  if (isSvg) {
     return (
-      <GatsbyImage
-        image={imageData}
-        alt={media.title || 'Media'}
-        className={className}
-      />
+      <img src={publicURL} alt={title || 'SVG Image'} className={className} />
     );
   }
 
-  // Handle SVGs separately, as they can be rendered directly in an <img> tag or embedded inline
-  if (media.file && media.file.contentType === 'image/svg+xml') {
-    return <img src={media.file.url} alt={media.title} className={className} />;
-  }
-
-  // Fallback to handling video files or other media types with raw file URLs
-  if (media.file && media.file.contentType.startsWith('video')) {
+  // Render video files
+  if (isVideo) {
     return (
-      // eslint-disable-next-line jsx-a11y/media-has-caption
       <video className={className} muted autoPlay loop>
-        <source src={media.file.url} type={media.file.contentType} />
+        <source src={publicURL} type={`video/${extension}`} />
       </video>
     );
   }
 
-  console.warn('Unsupported media type');
+  console.warn('Unsupported media type or missing data');
   return null;
 }
 
 Media.propTypes = {
-  className: PropTypes.string,
-  media: PropTypes.shape({
-    title: PropTypes.string,
-    gatsbyImageData: PropTypes.object,
-    file: PropTypes.shape({
-      contentType: PropTypes.string,
-      url: PropTypes.string,
-    }),
-  }).isRequired,
+  className: PropTypes.string.isRequired,
+  media: PropTypes.object.isRequired,
 };
