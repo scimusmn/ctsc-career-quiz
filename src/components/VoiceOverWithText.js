@@ -6,8 +6,9 @@ export default function VoiceOverWithText({ content, callback = () => {} }) {
   const { voiceOverAudio, voiceOverText } = content;
   const [wrappedCaptions, setWrappedCaptions] = useState('');
 
-  const videoSrc = voiceOverAudio ? voiceOverAudio.file.url : '';
-  const trackSrc = voiceOverText ? voiceOverText.file.url : '';
+  const videoSrc = voiceOverAudio?.localFile?.publicURL || '';
+  const trackSrc = voiceOverText?.localFile?.publicURL || '';
+  const audioType = voiceOverAudio?.localFile?.extension || 'mp3';
 
   const videoRef = useRef();
   const sourceRef = useRef();
@@ -63,11 +64,7 @@ export default function VoiceOverWithText({ content, callback = () => {} }) {
           errorInteract ? 'absolute bottom-0 my-4 h-14 w-full' : 'hidden'
         }
       >
-        <source
-          ref={sourceRef}
-          src={videoSrc}
-          type={voiceOverAudio ? voiceOverAudio.file.contentType : 'audio/mp3'}
-        />
+        <source ref={sourceRef} src={videoSrc} type={`audio/${audioType}`} />
         <track src={trackSrc} kind='captions' ref={trackRef} default />
       </video>
 

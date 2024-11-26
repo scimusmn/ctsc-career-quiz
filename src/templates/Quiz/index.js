@@ -19,11 +19,13 @@ export const pageQuery = graphql`
         }
         backgroundMedia {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
+            childImageSharp {
+              gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
+            }
           }
-          gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
         }
         listOfQuestionSets {
           id

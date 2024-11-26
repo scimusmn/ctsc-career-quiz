@@ -24,28 +24,32 @@ export const pageQuery = graphql`
         tags
         image {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
+            childImageSharp {
+              gatsbyImageData(width: 1920, layout: CONSTRAINED)
+            }
           }
-          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
       }
       media {
         title
-        file {
-          contentType
-          url
+        localFile {
+          extension
+          publicURL
+          childImageSharp {
+            gatsbyImageData(width: 1920, layout: CONSTRAINED)
+          }
         }
-        gatsbyImageData(width: 1920, layout: CONSTRAINED)
       }
       hint
       voiceOverAudio {
         title
         description
-        file {
-          contentType
-          url
+        localFile {
+          extension
+          publicURL
         }
       }
 
@@ -55,18 +59,20 @@ export const pageQuery = graphql`
         }
         media {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
+            childImageSharp {
+              gatsbyImageData(width: 1920, layout: CONSTRAINED)
+            }
           }
-          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
         voiceOverAudio {
           title
           description
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
       }
@@ -76,26 +82,28 @@ export const pageQuery = graphql`
         captionsFile {
           title
           description
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
         voiceOverAudio {
           title
           description
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
         media {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
+            childImageSharp {
+              gatsbyImageData(width: 1920, layout: CONSTRAINED)
+            }
           }
-          gatsbyImageData(width: 1920, layout: CONSTRAINED)
         }
       }
     }
@@ -113,11 +121,13 @@ export const pageQuery = graphql`
       backgroundMedia {
         title
         description
-        file {
-          contentType
-          url
+        localFile {
+          extension
+          publicURL
+          childImageSharp {
+            gatsbyImageData(width: 1920, layout: CONSTRAINED)
+          }
         }
-        gatsbyImageData(width: 1920, height: 1080, layout: FIXED)
       }
       quizSettings {
         title
@@ -132,30 +142,30 @@ export const pageQuery = graphql`
         }
         countdownTimerSoundEffect {
           title
-          file {
-            url
-            contentType
+          localFile {
+            extension
+            publicURL
           }
         }
         inputAnswerSoundEffect {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
         correctAnswerSoundEffect {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
         wrongAnswerSoundEffect {
           title
-          file {
-            contentType
-            url
+          localFile {
+            extension
+            publicURL
           }
         }
       }
